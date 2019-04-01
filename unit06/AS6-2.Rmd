@@ -200,7 +200,7 @@ PDF = approxfun(DEN$x, DEN$y, yleft = 0, yright = 0)
 #改為10秒一個區間
 bk = seq(1, 6, 1/6)
 
-#cx為30個區間的累積機率
+#cbk為30個區間的累積機率
 cbk = sapply(bk, function(bk) integrate(PDF, -Inf, bk)$value) 
 
 #鄰近區間的累積機率相扣，得出該區間的發生機率

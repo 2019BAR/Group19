@@ -235,7 +235,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">AS6-2</h1>
 <h4 class="author"><em>第19組</em></h4>
-<h4 class="date"><em>2019-04-01 20:54:09</em></h4>
+<h4 class="date"><em>2019-04-02 02:01:00</em></h4>
 
 </div>
 
@@ -388,7 +388,7 @@ PDF =<span class="st"> </span><span class="kw">approxfun</span>(DEN<span class="
 <span class="co">#改為10秒一個區間</span>
 bk =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">6</span>)
 
-<span class="co">#cx為30個區間的累積機率</span>
+<span class="co">#cbk為30個區間的累積機率</span>
 cbk =<span class="st"> </span><span class="kw">sapply</span>(bk, <span class="cf">function</span>(bk) <span class="kw">integrate</span>(PDF, <span class="op">-</span><span class="ot">Inf</span>, bk)<span class="op">$</span>value) 
 
 <span class="co">#鄰近區間的累積機率相扣，得出該區間的發生機率</span>
