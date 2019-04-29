@@ -234,7 +234,7 @@ gg <- gvisMotionChart(
 # cat(gg$html$chart, file= "gg.html")
 ```
 
-#####  用d3heatmap畫出前十大SR圖
+#####  用d3heatmap畫出SR(18個)績效圖
 ```{r}
 zxc = Z1 %>% 
   group_by(sr_id) %>% 
@@ -251,9 +251,9 @@ Z1_kpi = Z1 %>%
 zaq = data.frame(
   avg_score = Z1_kpi$avg_score,
   total_Rev = Z1_kpi$total_Rev,
-  contractlength = as.numeric(Z1_kpi$contractlength),
-  totalseller = Z1_kpi$totalseller,
-  row.names = Z1_kpi$sdr_id
+  Sales_length = as.numeric(Z1_kpi$contractlength),
+  numdeal = Z1_kpi$totalseller,
+  row.names = Z1_kpi$sr_id
 ) %>% t()
 
 d3heatmap(zaq, scale = "row", colors = "Spectral")
