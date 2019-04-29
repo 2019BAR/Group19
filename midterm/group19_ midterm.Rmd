@@ -1,0 +1,279 @@
+---
+title: 期中專案(OLIST)資料探索-業務績效
+author: 第19組
+output: 
+  html_document:
+    highlight: pygments
+    theme: flatly
+    css: style.css
+---
+
+```{r results='hide', message=FALSE, warning=FALSE, echo=F}
+# 這些程式碼設定網頁的格式，並安裝、載入一些基本的套件，請大家不要去改動<br>
+rm(list=ls(all=T))
+knitr::opts_chunk$set(comment = NA)
+knitr::opts_knit$set(global.par = TRUE)
+par(cex=0.8)
+options(scipen=20, digits=5, width=80)
+if(!require(pacman)) install.packages("pacman")
+```
+<hr>
+
+
+<br>
+```{r results='hide', message=FALSE, warning=FALSE}
+pacman::p_load(dplyr, ggplot2, dplyr, data.table, readr, data.table, plotly, d3heatmap,googleVis)
+```
+<hr>
+
+#####  讀取資料表
+```{r}
+load("data/olist.rdata")
+load("data/Z.rdata")
+```
+
+
+
+#####  整理前十大銷售種類資料框
+```{r}
+# 商品類別營業額
+  
+  P_cate = dplyr::select(P,product_id, product_category_name)
+  order_cate = left_join(I, P_cate, by = c("product_id")) %>% 
+    left_join(TPC, by = c("product_category_name")) %>% 
+    left_join(O, by = c("order_id"))
+  
+```
+
+```{r}
+# 銷售額前十大類別
+
+  order_cate %>% 
+    group_by(product_category_name_english) %>%
+    summarise(
+    itemsSold = n(),
+    totalRev = sum(price),
+    avgPrice = mean(price),
+    noProduct = n_distinct(product_id),
+    noSeller = n_distinct(seller_id),
+    dummy = 2018) %>% 
+    arrange(desc(totalRev)) %>% 
+    head(10)->top10
+
+top10$product_category_name_english ->top10Catergory
+top10Catergory
+```
+
+```{r}
+order_cate %>% 
+  filter(shipping_limit_date > "2018-06-01 00:00:00") %>% 
+  group_by(product_category_name_english) %>%
+    summarise(
+    itemsSold = n(),
+    totalRev = sum(price),
+    avgPrice = mean(price),
+    noProduct = n_distinct(product_id),
+    noSeller = n_distinct(seller_id),
+    dummy = 2018) %>% 
+    arrange(desc(totalRev)) %>% 
+    head(10)
+```
+
+```{r}
+order_cate %>%     # pull score & timestamp into 'O'
+  rename(
+    time = order_purchase_timestamp
+    ) %>% 
+  mutate(                                   # cut timestamp into quarter    
+    quarter = as.Date(cut(time, "quarter"))
+    ) %>%  filter(product_category_name_english %in% top10Catergory) %>% 
+    group_by(product_category_name_english,quarter) %>% 
+    summarise(
+    itemsSold = n(),
+    totalRev = sum(price),
+    avgPrice = mean(price),
+    noProduct = n_distinct(product_id),
+    noSeller = n_distinct(seller_id)
+   )  %>% 
+    arrange(desc(totalRev))->aa
+```
+
+```{r}
+AA = aa %>% 
+  filter(quarter >= as.Date("2017-04-01")) %>% 
+  as.data.frame %>% arrange(product_category_name_english,quarter)
+```
+
+```{r results='asis', tidy=FALSE, eval=F}
+
+op = options(gvis.plot.tag='chart')
+plot( gvisMotionChart(
+  AA, "product_category_name_english", "quarter", 
+  options=list(width=800, height=600) ))
+
+```
+
+
+
+#####  前10大seller資料框整理
+```{r}
+Z = I %>% group_by(seller_id) %>% summarise(
+  ItemsSold = n(),
+  Rev = sum(price),
+  noProd = n_distinct(product_id),
+  avgPrice = mean(price),
+  maxPrice = max(price),
+  minPrice = min(price),
+  avgFreight = mean(freight_value),
+  avgRevProd = Rev/noProd,
+  avgItemsProd = ItemsSold/noProd,
+  dummy= 2018
+)
+
+
+```
+
+```{r}
+X = unique(I[,c(1,4)]) %>% left_join(R[,2:3]) %>% 
+  group_by(seller_id) %>% summarise(
+    noReview = n(),
+    avgScore = mean(review_score),
+    minScore = min(review_score),
+    maxScore = max(review_score)) 
+summary(X)
+```
+
+```{r}
+Z = Z %>% left_join(X) %>% left_join(S)
+is.na(Z) %>% colSums
+
+##前 10 seller
+sellerTop10 <- Z %>%  top_n(10,wt=Rev) %>% arrange(desc(Rev))
+sellerTop10
+```
+
+
+#####  用GoogleVis畫出前10大seller
+
+```{r}
+sellerTop10givz <- gvisMotionChart( 
+  sellerTop10, "seller_id", "dummy", 
+  options=list(width=800, height=600,titleTextStyle="{color:'red', fontName:'Courier', fontSize:16}") )
+```
+
+<br><br><hr>
+
+
+#####  檢查sr,sdr相關欄位
+```{r}
+n_distinct(Z1$mql_id) == nrow(Z1)
+```
+
+
+```{r}
+n_distinct(Z1$seller_id) == nrow(Z1)
+```
+
+```{r}
+n_distinct(Z1$sdr_id) == nrow(Z1)
+n_distinct(Z1$sr_id) == nrow(Z1)
+```
+
+```{r}
+nrow(unique(Z1[, 2:4])) == nrow(Z1)
+```
+
+```{r}
+table(Z1$sr_id) %>% table
+```
+
+#####  Sales_Length資料預處理
+```{r}
+close_date = as.Date(Z1$won_date,"%Y-%m-%d",tz="Asia/Taipei")
+
+first_date = as.Date(Z1$first_contact_date,"%Y-%m-%d ",tz="Asia/Taipei")
+```
+
+```{r}
+Sales_length=as.numeric(close_date-first_date)
+SR_performance<- cbind(Z1,Sales_length)
+```
+
+#####  整理前10大SR資料框
+```{r}
+best_sr <-SR_performance %>% group_by(sr_id) %>%
+  summarise(num=length(sr_id))
+best_sr10 <- arrange(best_sr,desc(num))%>% head(10)
+left_join(best_sr10 ,SR_performance,by=c("sr_id") )->topsr
+```
+
+```{r}
+sr = group_by(topsr, sr_id) %>% summarise(
+  numdeal = n(),
+  totalsl = sum(Sales_length),
+  avgsl = mean(Sales_length),
+  totalRev = sum(Rev),
+  avgItemsSold = mean(ItemsSold),
+  avgRev = mean(Rev),
+  avgReview = mean(noReview),
+  avgScore = mean(avgScore),
+  dummy = 2018
+  ) %>% arrange( desc(numdeal) )
+sr
+```
+
+#####  用gooleVis畫出前十大SR圖
+```{r results='asis', tidy=FALSE, eval=F}
+sr$dummy = 2018
+op = options(gvis.plot.tag='chart')
+sr$avgsl <-round(sr$avgsl) 
+gg <- gvisMotionChart(
+  sr, "sr_id","dummy",
+  options=list(width=800, height=600) )
+# print(gg,file='gg8.html')
+# cat(gg$html$chart, file= "gg.html")
+```
+
+#####  用d3heatmap畫出前十大SR圖
+```{r}
+zxc = Z1 %>% 
+  group_by(sr_id) %>% 
+  summarise(price_sum = sum(Rev)) %>% 
+  arrange(desc(price_sum))
+
+Z1_kpi = Z1 %>% 
+  mutate(sum_score = avgScore * ItemsSold, talklength = difftime(won_date, first_contact_date)) %>% 
+  group_by(sr_id) %>% 
+  summarise(avg_score = sum(sum_score) / sum(ItemsSold), total_Rev = sum(Rev), contractlength = mean(as.numeric(talklength)), totalseller = n())
+```
+
+```{r}
+zaq = data.frame(
+  avg_score = Z1_kpi$avg_score,
+  total_Rev = Z1_kpi$total_Rev,
+  contractlength = as.numeric(Z1_kpi$contractlength),
+  totalseller = Z1_kpi$totalseller,
+  row.names = Z1_kpi$sdr_id
+) %>% t()
+
+d3heatmap(zaq, scale = "row", colors = "Spectral")
+```
+
+
+#####  用heatmap畫出sr與seller_behavior的適性圖
+```{r}
+bh = group_by(topsr, sr_id,lead_behaviour_profile) %>% summarise(
+  numdeal = n()
+  ) %>% arrange( desc(numdeal) )
+bh
+```
+
+```{r}
+ggplot(bh, aes(lead_behaviour_profile,sr_id)) + #aes(x,y)
+    geom_tile(aes(fill = numdeal),colour = "white")+ #geom_tile: 區塊著色
+    scale_fill_gradient(low = "white",high = "steelblue",)+ #數值低：白色
+    theme(axis.text.x = element_text(angle=90, hjust=1))
+```
+
+
+
