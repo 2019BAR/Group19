@@ -236,7 +236,7 @@ $(document).ready(function () {
 <h1 class="title toc-ignore">UNIT13A：類別模型、預測機率與商業決策</h1>
 <h3 class="subtitle"><em>案例一：預防性醫療</em></h3>
 <h4 class="author"><em>中山大學管理學院 group19</em></h4>
-<h4 class="date"><em>2019-05-27 19:55:13</em></h4>
+<h4 class="date"><em>2019-05-27 20:11:09</em></h4>
 
 </div>
 
@@ -408,7 +408,11 @@ p1 =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">seq
 <p class="qiz">
     ■ 兩個自變數的勝率效果分別是？<br><br>
 </p>
-<p>OfficeVisits勝率效果:exp(0.0821)<br><br> Narcotics勝率效果:exp(0.0763)<br><br> OfficeVisits每增加1，勝率效果為變成原來的1.0856倍<br><br> Narcotics每增加1，勝率效果為變成原來的1.0793倍<br><br></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exp</span>(<span class="fl">0.0821</span>)</code></pre></div>
+<pre><code>[1] 1.0856</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exp</span>(<span class="fl">0.0763</span>)</code></pre></div>
+<pre><code>[1] 1.0793</code></pre>
+<p>OfficeVisits勝率效果:exp(0.0821)=1.0856<br><br> Narcotics勝率效果:exp(0.0763)=1.0793<br><br> OfficeVisits每增加1，勝率效果為變成原來的1.0856倍<br><br> Narcotics每增加1，勝率效果為變成原來的1.0793倍<br><br></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df1 =<span class="st"> </span><span class="kw">data.frame</span>(
   <span class="dt">OfficeVisits =</span> <span class="kw">quantile</span>(D<span class="op">$</span>OfficeVisits, <span class="fl">0.25</span>)<span class="op">+</span><span class="dv">1</span>, 
   <span class="dt">Narcotics =</span> <span class="kw">quantile</span>(D<span class="op">$</span>Narcotics, <span class="fl">0.25</span>))
@@ -437,13 +441,15 @@ OfficeVisits:0.12035,增加0.00843,也就是原本的機率乘上1.0753<br><br> 
 <span class="kw">predict</span>(glm1, df, <span class="dt">type=</span><span class="st">&quot;response&quot;</span>)</code></pre></div>
 <pre><code>      0%      25%      50%      75%     100% 
 0.066228 0.111920 0.170179 0.289471 0.996437 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exp</span>(<span class="fl">0.0821</span>)</code></pre></div>
-<pre><code>[1] 1.0856</code></pre>
-0.289471<br>
+0.289471 <br>
 <p class="qiz">
     ■ 兩個自變數的勝率效果分別是？<br>
 </p>
-<p>OfficeVisits勝率效果:exp(0.0821)<br><br> Narcotics勝率效果:exp(0.0763)<br><br> OfficeVisits每增加1，勝率會變成1.0856<br><br> Narcotic每增加1，勝率會變成1.0793<br><br></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exp</span>(<span class="fl">0.0821</span>)</code></pre></div>
+<pre><code>[1] 1.0856</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exp</span>(<span class="fl">0.0763</span>)</code></pre></div>
+<pre><code>[1] 1.0793</code></pre>
+<p>OfficeVisits勝率效果:exp(0.0821)=1.085564<br><br> Narcotics勝率效果:exp(0.0763)=1.079286<br><br> OfficeVisits每增加1，勝率效果為變成原來的1.0856倍<br><br> Narcotic每增加1，勝率效果為變成原來的1.0793倍<br><br></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df1 =<span class="st"> </span><span class="kw">data.frame</span>(
   <span class="dt">OfficeVisits =</span> <span class="kw">quantile</span>(D<span class="op">$</span>OfficeVisits, <span class="fl">0.75</span>)<span class="op">+</span><span class="dv">1</span>, 
   <span class="dt">Narcotics =</span> <span class="kw">quantile</span>(D<span class="op">$</span>Narcotics, <span class="fl">0.75</span>))

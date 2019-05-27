@@ -150,8 +150,13 @@ predict(glm1, df, type="response")
 <p class="qiz">
 &emsp; &emsp; ■ 兩個自變數的勝率效果分別是？<br><br>
 </p class="qiz">
-OfficeVisits勝率效果:exp(0.0821)<br><br>
-Narcotics勝率效果:exp(0.0763)<br><br>
+```{r}
+exp(0.0821)
+exp(0.0763)
+```
+
+OfficeVisits勝率效果:exp(0.0821)=1.0856<br><br>
+Narcotics勝率效果:exp(0.0763)=1.0793<br><br>
 OfficeVisits每增加1，勝率效果為變成原來的1.0856倍<br><br>
 Narcotics每增加1，勝率效果為變成原來的1.0793倍<br><br>
 
@@ -182,16 +187,21 @@ Narcotics:0.11973,增加0.00781,也就是原本的機率乘上1.0698<br><br><br>
 ```{r}
 df = data.frame(OfficeVisits = quantile(D$OfficeVisits), Narcotics=quantile(D$Narcotics))
 predict(glm1, df, type="response")
-exp(0.0821)
 ```
-0.289471<br>
+0.289471
+<br>
 <p class="qiz">
 &emsp; &emsp; ■ 兩個自變數的勝率效果分別是？<br>
 </p class="qiz">
-OfficeVisits勝率效果:exp(0.0821)<br><br>
-Narcotics勝率效果:exp(0.0763)<br><br>
-OfficeVisits每增加1，勝率會變成1.0856<br><br>
-Narcotic每增加1，勝率會變成1.0793<br><br>
+```{r}
+exp(0.0821)
+exp(0.0763)
+```
+
+OfficeVisits勝率效果:exp(0.0821)=1.085564<br><br>
+Narcotics勝率效果:exp(0.0763)=1.079286<br><br>
+OfficeVisits每增加1，勝率效果為變成原來的1.0856倍<br><br>
+Narcotic每增加1，勝率效果為變成原來的1.0793倍<br><br>
 
 ```{r}
 df1 = data.frame(
